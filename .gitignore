@@ -1,0 +1,80 @@
+# =========================================================
+# .NET, NUnit, Reqnroll, Selenium project .gitignore
+# =========================================================
+
+# === Build Directories ===
+bin/
+obj/
+[Bb]uild/
+[Ll]og/
+TestResults/
+.vs/
+.vscode/
+_ReSharper*/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.cache
+*.dbmdl
+
+# === Reqnroll / SpecFlow generated files ===
+*.feature.cs
+*.feature.xlsx.cs
+*.feature.pdf.cs
+*.feature.xml.cs
+Features/Generated/
+ReqnrollReport/
+LivingDoc/
+
+# === NUnit test results ===
+*.trx
+*.xml
+TestResult.xml
+nunit-*.xml
+
+# === Selenium related ===
+# Ignore driver binaries if downloaded automatically
+drivers/
+*.exe
+chromedriver*
+geckodriver*
+msedgedriver*
+*.log
+!SeleniumDrivers.config   # keep any config file if you have one
+
+# === OS Generated Files ===
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+desktop.ini
+
+# === NuGet Packages ===
+*.nupkg
+packages/
+.nuget/
+*.snupkg
+
+# === User-Specific Files ===
+*.userprefs
+*.local
+*.orig
+*.tmp
+*.swp
+
+# === Configuration Secrets ===
+appsettings.Development.json
+*.secrets.json
+.env
+
+# === Test Output / Logs ===
+Logs/
+logs/
+output/
+screenshots/
+screenshots/*.png
+Reports/
+Reports/*
+AllureResults/
+ExtentReports/
