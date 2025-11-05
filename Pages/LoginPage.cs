@@ -1,41 +1,46 @@
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
+using learning_reqnroll_project_vadzim.Configuration;
 
-namespace WebTestProject.Pages;
+namespace learning_reqnroll_project_vadzim.Pages;
 
-public class LoginPage
+public class LoginPage : BasePage
 {
-    private static IWebDriver? _driver;
+    // Locators
+    private By UsernameField => By.Id("user-name");
+    private By PasswordField => By.Id("password");
+    private By LoginButton => By.Id("login-button");
+    private By DashboardHeader => By.ClassName("app_logo");
 
-    public static IWebDriver Driver
+    public LoginPage(IWebDriver driver, TestConfiguration config) : base(driver, config)
     {
-        get
-        {
-            _driver ??= new ChromeDriver();
-            return _driver;
-        }
     }
 
     public void NavigateToLoginPage()
     {
-        Driver.Navigate().GoToUrl("https://www.saucedemo.com/");
+        NavigateToUrl(Config.BaseUrl);
+        WaitForElement(UsernameField);
     }
 
     public void EnterCredentials(string username, string password)
     {
-        Driver.FindElement(By.Id("user-name")).SendKeys(username);
-        Driver.FindElement(By.Id("password")).SendKeys(password);
-        Driver.FindElement(By.Id("login-button")).Click();
+        if (string.IsNullOrWhiteSpace(username))
+            throw new ArgumentException("Username cannot be null or empty", nameof(username));
+        if (string.IsNullOrWhiteSpace(password))
+            throw new ArgumentException("Password cannot be null or empty", nameof(password));
+
+        SendKeysToElement(UsernameField, username);
+        SendKeysToElement(PasswordField, password);
+        ClickElement(LoginButton);
     }
 
-    public bool IsDashboardVisible()
+    public void VerifyDashboardIsVisible()
     {
-        return Driver.Url.Contains("inventory");
-    }
-
-    public static void QuitBrowser()
-    {
-        _driver?.Quit();
-        _driver = null;
+        WaitForUrlContains("inventory.html");
+        
+        var header = WaitForElement(DashboardHeader);
+        if (!header.Displayed)
+        {
+            throw new InvalidOperationException("Dashboard header is not visible after login");
+        }
     }
 }

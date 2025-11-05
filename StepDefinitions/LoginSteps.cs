@@ -1,34 +1,35 @@
 using Reqnroll;
-using NUnit.Framework;
-using WebTestProject.Pages;
+using learning_reqnroll_project_vadzim.Pages;
 
-namespace WebTestProject.StepDefinitions;
+namespace learning_reqnroll_project_vadzim.StepDefinitions;
 
 [Binding]
-public class LoginSteps
+public class LoginSteps : BaseSteps
 {
-    private readonly LoginPage _loginPage;
-
-    public LoginSteps()
+    public LoginSteps(ScenarioContext scenarioContext) : base(scenarioContext)
     {
-        _loginPage = new LoginPage();
+    }
+
+    private LoginPage GetLoginPage()
+    {
+        return GetPage<LoginPage>();
     }
 
     [Given("I am on the login page")]
     public void GivenIAmOnTheLoginPage()
     {
-        _loginPage.NavigateToLoginPage();
+        GetLoginPage().NavigateToLoginPage();
     }
 
     [When("I enter valid credentials")]
     public void WhenIEnterValidCredentials()
     {
-        _loginPage.EnterCredentials("standard_user", "secret_sauce");
+        GetLoginPage().EnterCredentials(Config.Credentials.Username, Config.Credentials.Password);
     }
 
     [Then("I should see the dashboard")]
     public void ThenIShouldSeeTheDashboard()
     {
-        Assert.That(_loginPage.IsDashboardVisible());
+        GetLoginPage().VerifyDashboardIsVisible();
     }
 }

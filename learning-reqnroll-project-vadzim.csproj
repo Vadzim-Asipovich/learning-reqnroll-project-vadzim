@@ -11,6 +11,10 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
     <PackageReference Include="NUnit" Version="4.2.2" />
     <PackageReference Include="NUnit.Analyzers" Version="4.4.0" />
@@ -21,6 +25,19 @@
     <PackageReference Include="Selenium.Support" Version="4.38.0" />
     <PackageReference Include="Selenium.WebDriver" Version="4.38.0" />
     <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="142.0.7444.5900" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Features\**\*.feature.cs" />
   </ItemGroup>
 
   <ItemGroup>
