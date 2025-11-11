@@ -29,4 +29,12 @@ public class LoginSteps : BaseSteps
     {
         GetLoginPage().VerifyDashboardIsVisible();
     }
+
+    [Given("I am logged in")]
+    public void GivenIAmLoggedIn()
+    {
+        GetLoginPage().NavigateToLoginPage();
+        GetLoginPage().EnterCredentials(Config.Credentials.Username, Config.Credentials.Password);
+        GetLoginPage().VerifyDashboardIsVisible();
+    }
 }
