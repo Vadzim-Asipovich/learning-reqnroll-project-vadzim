@@ -1,8 +1,12 @@
+using System;
+using System.IO;
 using Reqnroll;
 using OpenQA.Selenium;
 using NUnit.Framework;
+using AventStack.ExtentReports;
 using learning_reqnroll_project_vadzim.Configuration;
 using learning_reqnroll_project_vadzim.Drivers;
+using learning_reqnroll_project_vadzim.Reports;
 
 namespace learning_reqnroll_project_vadzim.Hooks;
 
@@ -17,9 +21,27 @@ public class Hooks
         _scenarioContext = scenarioContext;
     }
 
+    [BeforeTestRun]
+    public static void BeforeTestRun()
+    {
+        var config = TestConfiguration.Load();
+        ExtentReportsManager.GetInstance(config.Report);
+    }
+
+    [AfterTestRun]
+    public static void AfterTestRun()
+    {
+        ExtentReportsManager.Flush();
+    }
+
     [BeforeScenario]
     public void BeforeScenario()
     {
+        var scenarioTitle = _scenarioContext.ScenarioInfo.Title;
+        var scenarioDescription = _scenarioContext.ScenarioInfo.Description;
+        var extentTest = ExtentReportsManager.CreateTest(scenarioTitle, scenarioDescription);
+        _scenarioContext.Set(extentTest, "ExtentTest");
+
         IWebDriver? driver = null;
         try
         {
@@ -27,9 +49,14 @@ public class Hooks
             driver = driverFactory.CreateDriver();
             _scenarioContext.Set(driver, "WebDriver");
             _scenarioContext.Set(Config, "TestConfiguration");
+
+            var test = ExtentReportsManager.GetTest();
+            test.Log(Status.Info, $"Starting scenario: {scenarioTitle}");
         }
         catch (Exception ex)
         {
+            var test = ExtentReportsManager.GetTest();
+            test.Log(Status.Fatal, $"Failed to create WebDriver: {ex.Message}");
             TestContext.Out.WriteLine($"Failed to create WebDriver: {ex.Message}");
             driver?.Dispose();
             throw;
@@ -39,29 +66,77 @@ public class Hooks
     [AfterScenario]
     public void AfterScenario()
     {
-        if (!_scenarioContext.ContainsKey("WebDriver"))
-            return;
+        var testResult = TestContext.CurrentContext.Result;
+        var status = testResult.Outcome.Status.ToString();
+        var errorMessage = testResult.Message;
+        var stackTrace = testResult.StackTrace;
+
+        ExtentTest? extentTest = null;
+        try
+        {
+            if (_scenarioContext.ContainsKey("ExtentTest"))
+            {
+                extentTest = _scenarioContext.Get<ExtentTest>("ExtentTest");
+            }
+        }
+        catch
+        {
+        }
 
         IWebDriver? driver = null;
         try
         {
-            driver = _scenarioContext.Get<IWebDriver>("WebDriver");
-            
-            // Take screenshot on failure
-            var testResult = TestContext.CurrentContext.Result;
-            var status = testResult.Outcome.Status.ToString();
-            if (status != "Passed")
+            if (_scenarioContext.ContainsKey("WebDriver"))
             {
-                TakeScreenshot(driver, _scenarioContext.ScenarioInfo.Title);
+                driver = _scenarioContext.Get<IWebDriver>("WebDriver");
+                
+                if (status != "Passed")
+                {
+                    var screenshotPath = TakeScreenshot(driver, _scenarioContext.ScenarioInfo.Title);
+                    if (extentTest != null && !string.IsNullOrEmpty(screenshotPath))
+                    {
+                        try
+                        {
+                            extentTest.Fail("Screenshot captured: " + 
+                                extentTest.AddScreenCaptureFromPath(screenshotPath));
+                        }
+                        catch
+                        {
+                            extentTest.Log(Status.Fail, $"Screenshot captured: {screenshotPath}");
+                        }
+                    }
+                }
             }
         }
         catch (Exception ex)
         {
             TestContext.Out.WriteLine($"Error during test cleanup: {ex.Message}");
+            if (extentTest != null)
+            {
+                extentTest.Log(Status.Warning, $"Error during cleanup: {ex.Message}");
+            }
         }
         finally
         {
-            // Proper cleanup - Dispose() calls Quit() internally
+            if (extentTest != null)
+            {
+                var extentStatus = status switch
+                {
+                    "Passed" => Status.Pass,
+                    "Failed" => Status.Fail,
+                    "Skipped" => Status.Skip,
+                    _ => Status.Warning
+                };
+
+                extentTest.Log(extentStatus, $"Test {status}");
+
+                if (!string.IsNullOrEmpty(errorMessage))
+                    extentTest.Log(Status.Error, $"Error: {errorMessage}");
+
+                if (!string.IsNullOrEmpty(stackTrace))
+                    extentTest.Log(Status.Error, $"Stack Trace: {stackTrace}");
+            }
+
             try
             {
                 driver?.Dispose();
@@ -70,10 +145,12 @@ public class Hooks
             {
                 TestContext.Out.WriteLine($"Error disposing WebDriver: {ex.Message}");
             }
+
+            ExtentReportsManager.EndTest();
         }
     }
 
-    private void TakeScreenshot(IWebDriver driver, string scenarioTitle)
+    private string? TakeScreenshot(IWebDriver driver, string scenarioTitle)
     {
         try
         {
@@ -83,7 +160,6 @@ public class Hooks
                 var fileName = $"Screenshot_{scenarioTitle}_{DateTime.Now:yyyyMMdd_HHmmss}.png";
                 fileName = string.Join("_", fileName.Split(Path.GetInvalidFileNameChars()));
                 
-                // More robust path handling
                 var screenshotsDir = GetScreenshotsDirectory();
                 Directory.CreateDirectory(screenshotsDir);
                 
@@ -92,17 +168,18 @@ public class Hooks
                 
                 TestContext.AddTestAttachment(filePath);
                 TestContext.Out.WriteLine($"Screenshot saved: {filePath}");
+                return filePath;
             }
         }
         catch (Exception ex)
         {
             TestContext.Out.WriteLine($"Failed to take screenshot: {ex.Message}");
         }
+        return null;
     }
 
     private static string GetScreenshotsDirectory()
     {
-        // Try test directory first
         try
         {
             var testDir = TestContext.CurrentContext.TestDirectory;
@@ -113,10 +190,8 @@ public class Hooks
         }
         catch
         {
-            // Fall through to next option
         }
 
-        // Fallback to current directory
         var currentDir = Directory.GetCurrentDirectory();
         return Path.Combine(currentDir, "Screenshots");
     }

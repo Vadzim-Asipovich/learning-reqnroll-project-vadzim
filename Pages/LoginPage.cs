@@ -1,3 +1,4 @@
+using System;
 using OpenQA.Selenium;
 using learning_reqnroll_project_vadzim.Configuration;
 
@@ -5,7 +6,6 @@ namespace learning_reqnroll_project_vadzim.Pages;
 
 public class LoginPage : BasePage
 {
-    // Locators
     private By UsernameField => By.Id("user-name");
     private By PasswordField => By.Id("password");
     private By LoginButton => By.Id("login-button");

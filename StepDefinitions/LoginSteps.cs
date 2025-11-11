@@ -10,10 +10,7 @@ public class LoginSteps : BaseSteps
     {
     }
 
-    private LoginPage GetLoginPage()
-    {
-        return GetPage<LoginPage>();
-    }
+    private LoginPage GetLoginPage() => GetPage<LoginPage>();
 
     [Given("I am on the login page")]
     public void GivenIAmOnTheLoginPage()

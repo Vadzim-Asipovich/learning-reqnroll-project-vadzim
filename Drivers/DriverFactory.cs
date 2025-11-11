@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
@@ -57,23 +60,16 @@ public class DriverFactory
         
         if (_config.Browser.Headless)
         {
-            if (options is ChromeOptions chromeOptions)
-                chromeOptions.AddArgument("--headless=new");
-            else if (options is EdgeOptions edgeOptions)
-                edgeOptions.AddArgument("--headless=new");
+            AddArgument(options, "--headless=new");
         }
         
-        // Add configurable browser arguments
         if (_config.Browser.BrowserArguments != null && _config.Browser.BrowserArguments.Any())
         {
             foreach (var argument in _config.Browser.BrowserArguments)
             {
                 if (!string.IsNullOrWhiteSpace(argument))
                 {
-                    if (options is ChromeOptions chromeOpts)
-                        chromeOpts.AddArgument(argument);
-                    else if (options is EdgeOptions edgeOpts)
-                        edgeOpts.AddArgument(argument);
+                    AddArgument(options, argument);
                 }
             }
         }
@@ -81,12 +77,17 @@ public class DriverFactory
         return options;
     }
 
+    private void AddArgument(DriverOptions options, string argument)
+    {
+        if (options is ChromeOptions chromeOptions)
+            chromeOptions.AddArgument(argument);
+        else if (options is EdgeOptions edgeOptions)
+            edgeOptions.AddArgument(argument);
+    }
+
     private void ConfigureDriver(IWebDriver driver)
     {
-        // Set page load timeout only - NO implicit waits
         driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(_config.Browser.PageLoadTimeoutSeconds);
-        
-        // Explicitly set implicit wait to 0 to avoid conflicts with explicit waits
         driver.Manage().Timeouts().ImplicitWait = TimeSpan.Zero;
     }
 }

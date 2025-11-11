@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 
@@ -8,6 +12,7 @@ public class TestConfiguration
     public string BaseUrl { get; set; } = string.Empty;
     public Credentials Credentials { get; set; } = new();
     public BrowserSettings Browser { get; set; } = new();
+    public ReportSettings Report { get; set; } = new();
 
     private static TestConfiguration? _instance;
     private static readonly object _lock = new object();
@@ -34,8 +39,6 @@ public class TestConfiguration
 
             var testConfig = new TestConfiguration();
             configuration.Bind(testConfig);
-            
-            // Validate configuration
             testConfig.Validate();
             
             _instance = testConfig;
@@ -45,21 +48,18 @@ public class TestConfiguration
 
     private static string GetBasePath()
     {
-        // Try AppContext.BaseDirectory first (works in most scenarios)
         var baseDirectory = AppContext.BaseDirectory;
         if (!string.IsNullOrEmpty(baseDirectory) && Directory.Exists(baseDirectory))
         {
             return baseDirectory;
         }
 
-        // Fallback to executing assembly location
         var assemblyLocation = Assembly.GetExecutingAssembly().Location;
         if (!string.IsNullOrEmpty(assemblyLocation))
         {
             return Path.GetDirectoryName(assemblyLocation) ?? Directory.GetCurrentDirectory();
         }
 
-        // Final fallback
         return Directory.GetCurrentDirectory();
     }
 
@@ -127,4 +127,13 @@ public class BrowserSettings
     public int ExplicitWaitSeconds { get; set; } = 10;
     public int PageLoadTimeoutSeconds { get; set; } = 30;
     public List<string> BrowserArguments { get; set; } = new();
+}
+
+public class ReportSettings
+{
+    public string? ReportPath { get; set; }
+    public string Theme { get; set; } = "Dark";
+    public string DocumentTitle { get; set; } = "Test Execution Report";
+    public string ReportName { get; set; } = "Reqnroll Test Report";
+    public bool EnableTimeline { get; set; } = true;
 }

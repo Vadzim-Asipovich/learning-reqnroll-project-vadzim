@@ -1,3 +1,4 @@
+using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using learning_reqnroll_project_vadzim.Configuration;
@@ -23,20 +24,15 @@ public abstract class BasePage
 
     protected IWebElement WaitForElement(By locator, int? timeoutSeconds = null)
     {
-        var wait = timeoutSeconds.HasValue 
-            ? new WebDriverWait(Driver, TimeSpan.FromSeconds(timeoutSeconds.Value))
-            : Wait;
-        
-        return wait.Until(driver =>
-        {
-            var element = driver.FindElement(locator);
-            if (element.Displayed && element.Enabled)
-                return element;
-            return null;
-        });
+        return WaitForElement(locator, timeoutSeconds, e => e.Displayed && e.Enabled);
     }
 
     protected IWebElement WaitForElementClickable(By locator, int? timeoutSeconds = null)
+    {
+        return WaitForElement(locator, timeoutSeconds, e => e.Displayed && e.Enabled);
+    }
+
+    private IWebElement WaitForElement(By locator, int? timeoutSeconds, Func<IWebElement, bool> condition)
     {
         var wait = timeoutSeconds.HasValue 
             ? new WebDriverWait(Driver, TimeSpan.FromSeconds(timeoutSeconds.Value))
@@ -45,7 +41,7 @@ public abstract class BasePage
         return wait.Until(driver =>
         {
             var element = driver.FindElement(locator);
-            return element.Displayed && element.Enabled ? element : null;
+            return condition(element) ? element : null;
         });
     }
 
