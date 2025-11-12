@@ -24,11 +24,8 @@ public class ShoppingCartPage : BasePage
     {
         var badge = WaitForElement(CartBadge);
         var actualCount = badge.Text;
-        if (actualCount != expectedCount)
-        {
-            throw new InvalidOperationException(
-                $"Expected cart count '{expectedCount}' but found '{actualCount}'");
-        }
+        Assert.That(actualCount, Is.EqualTo(expectedCount), 
+            $"Expected cart count '{expectedCount}' but found '{actualCount}'");
     }
 
     public void RemoveItemFromCart()
@@ -38,14 +35,8 @@ public class ShoppingCartPage : BasePage
 
     public void VerifyCartIsEmpty()
     {
-        try
-        {
-            var badge = Driver.FindElement(CartBadge);
-            throw new InvalidOperationException("Cart is not empty - badge is still visible");
-        }
-        catch (NoSuchElementException)
-        {
-        }
+        var isCartBadgeVisible = IsElementVisible(CartBadge, timeoutSeconds: 2);
+        Assert.That(isCartBadgeVisible, Is.False, "Cart is not empty - badge is still visible");
     }
 }
 

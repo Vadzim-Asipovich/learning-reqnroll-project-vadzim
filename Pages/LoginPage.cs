@@ -38,9 +38,6 @@ public class LoginPage : BasePage
         WaitForUrlContains("inventory.html");
         
         var header = WaitForElement(DashboardHeader);
-        if (!header.Displayed)
-        {
-            throw new InvalidOperationException("Dashboard header is not visible after login");
-        }
+        Assert.That(header.Displayed, Is.True, "Dashboard header is not visible after login");
     }
 }
