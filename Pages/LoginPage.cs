@@ -33,11 +33,9 @@ public class LoginPage : BasePage
         ClickElement(LoginButton);
     }
 
-    public void VerifyDashboardIsVisible()
+    public IWebElement GetDashboardHeader()
     {
         WaitForUrlContains("inventory.html");
-        
-        var header = WaitForElement(DashboardHeader);
-        Assert.That(header.Displayed, Is.True, "Dashboard header is not visible after login");
+        return WaitForElement(DashboardHeader);
     }
 }

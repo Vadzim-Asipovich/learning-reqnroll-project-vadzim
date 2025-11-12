@@ -21,7 +21,9 @@ public class ShoppingCartSteps : BaseSteps
     [Then("I should see the item count in the cart icon is {string}")]
     public void ThenIShouldSeeTheItemCountInTheCartIconIs(string expectedCount)
     {
-        GetShoppingCartPage().VerifyCartItemCount(expectedCount);
+        var actualCount = GetShoppingCartPage().GetCartItemCount();
+        Assert.That(actualCount, Is.EqualTo(expectedCount), 
+            $"Expected cart count '{expectedCount}' but found '{actualCount}'");
     }
 
     [Given("I have added an item to the cart")]
@@ -39,7 +41,8 @@ public class ShoppingCartSteps : BaseSteps
     [Then("the cart should be empty")]
     public void ThenTheCartShouldBeEmpty()
     {
-        GetShoppingCartPage().VerifyCartIsEmpty();
+        var isCartEmpty = GetShoppingCartPage().IsCartEmpty();
+        Assert.That(isCartEmpty, Is.True, "Cart is not empty - badge is still visible");
     }
 }
 

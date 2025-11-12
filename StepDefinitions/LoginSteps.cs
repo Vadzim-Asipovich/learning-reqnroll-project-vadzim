@@ -27,7 +27,8 @@ public class LoginSteps : BaseSteps
     [Then("I should see the dashboard")]
     public void ThenIShouldSeeTheDashboard()
     {
-        GetLoginPage().VerifyDashboardIsVisible();
+        var header = GetLoginPage().GetDashboardHeader();
+        Assert.That(header.Displayed, Is.True, "Dashboard header is not visible after login");
     }
 
     [Given("I am logged in")]
@@ -35,6 +36,7 @@ public class LoginSteps : BaseSteps
     {
         GetLoginPage().NavigateToLoginPage();
         GetLoginPage().EnterCredentials(Config.Credentials.Username, Config.Credentials.Password);
-        GetLoginPage().VerifyDashboardIsVisible();
+        var header = GetLoginPage().GetDashboardHeader();
+        Assert.That(header.Displayed, Is.True, "Dashboard header is not visible after login");
     }
 }

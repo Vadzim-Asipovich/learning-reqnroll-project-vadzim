@@ -20,12 +20,10 @@ public class ShoppingCartPage : BasePage
         ClickElement(FirstAddToCartButton);
     }
 
-    public void VerifyCartItemCount(string expectedCount)
+    public string GetCartItemCount()
     {
         var badge = WaitForElement(CartBadge);
-        var actualCount = badge.Text;
-        Assert.That(actualCount, Is.EqualTo(expectedCount), 
-            $"Expected cart count '{expectedCount}' but found '{actualCount}'");
+        return badge.Text;
     }
 
     public void RemoveItemFromCart()
@@ -33,10 +31,9 @@ public class ShoppingCartPage : BasePage
         ClickElement(RemoveButton);
     }
 
-    public void VerifyCartIsEmpty()
+    public bool IsCartEmpty()
     {
-        var isCartBadgeVisible = IsElementVisible(CartBadge, timeoutSeconds: 2);
-        Assert.That(isCartBadgeVisible, Is.False, "Cart is not empty - badge is still visible");
+        return !IsElementVisible(CartBadge, timeoutSeconds: 2);
     }
 }
 
