@@ -1,41 +1,34 @@
-using System;
 using OpenQA.Selenium;
 using learning_reqnroll_project_vadzim.Configuration;
+using learning_reqnroll_project_vadzim.Pages.Components;
 
 namespace learning_reqnroll_project_vadzim.Pages;
 
 public class LoginPage : BasePage
 {
-    private By UsernameField => By.Id("user-name");
-    private By PasswordField => By.Id("password");
-    private By LoginButton => By.Id("login-button");
-    private By DashboardHeader => By.ClassName("app_logo");
+    private readonly LoginFormComponent _loginForm;
+    private readonly DashboardHeaderComponent _dashboardHeader;
 
     public LoginPage(IWebDriver driver, TestConfiguration config) : base(driver, config)
     {
+        _loginForm = new LoginFormComponent(driver, config);
+        _dashboardHeader = new DashboardHeaderComponent(driver, config);
     }
 
     public void NavigateToLoginPage()
     {
         NavigateToUrl(Config.BaseUrl);
-        WaitForElement(UsernameField);
+        _loginForm.WaitForLoginForm();
     }
 
     public void EnterCredentials(string username, string password)
     {
-        if (string.IsNullOrWhiteSpace(username))
-            throw new ArgumentException("Username cannot be null or empty", nameof(username));
-        if (string.IsNullOrWhiteSpace(password))
-            throw new ArgumentException("Password cannot be null or empty", nameof(password));
-
-        SendKeysToElement(UsernameField, username);
-        SendKeysToElement(PasswordField, password);
-        ClickElement(LoginButton);
+        _loginForm.EnterCredentials(username, password);
     }
 
     public IWebElement GetDashboardHeader()
     {
         WaitForUrlContains("inventory.html");
-        return WaitForElement(DashboardHeader);
+        return _dashboardHeader.GetHeader();
     }
 }

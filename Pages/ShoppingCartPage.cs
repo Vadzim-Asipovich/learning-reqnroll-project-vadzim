@@ -1,18 +1,18 @@
-using System;
 using OpenQA.Selenium;
 using learning_reqnroll_project_vadzim.Configuration;
+using learning_reqnroll_project_vadzim.Pages.Components;
 
 namespace learning_reqnroll_project_vadzim.Pages;
 
 public class ShoppingCartPage : BasePage
 {
     private By FirstAddToCartButton => By.Id("add-to-cart-sauce-labs-backpack");
-    private By CartIcon => By.ClassName("shopping_cart_link");
-    private By CartBadge => By.ClassName("shopping_cart_badge");
     private By RemoveButton => By.Id("remove-sauce-labs-backpack");
+    private readonly ShoppingCartComponent _shoppingCart;
 
     public ShoppingCartPage(IWebDriver driver, TestConfiguration config) : base(driver, config)
     {
+        _shoppingCart = new ShoppingCartComponent(driver, config);
     }
 
     public void AddFirstItemToCart()
@@ -22,8 +22,7 @@ public class ShoppingCartPage : BasePage
 
     public string GetCartItemCount()
     {
-        var badge = WaitForElement(CartBadge);
-        return badge.Text;
+        return _shoppingCart.GetCartItemCount();
     }
 
     public void RemoveItemFromCart()
@@ -33,7 +32,7 @@ public class ShoppingCartPage : BasePage
 
     public bool IsCartEmpty()
     {
-        return !IsElementVisible(CartBadge, timeoutSeconds: 2);
+        return _shoppingCart.IsCartEmpty();
     }
 }
 
