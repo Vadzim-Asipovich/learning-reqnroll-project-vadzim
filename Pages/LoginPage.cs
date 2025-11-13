@@ -1,13 +1,15 @@
 using OpenQA.Selenium;
+using NUnit.Framework;
 using learning_reqnroll_project_vadzim.Configuration;
 using learning_reqnroll_project_vadzim.Pages.Components;
 
 namespace learning_reqnroll_project_vadzim.Pages;
 
-public class LoginPage : BasePage
+public class LoginPage : BasePage<LoginPage>
 {
     private readonly LoginFormComponent _loginForm;
     private readonly DashboardHeaderComponent _dashboardHeader;
+    private By UsernameField => By.Id("user-name");
 
     public LoginPage(IWebDriver driver, TestConfiguration config) : base(driver, config)
     {
@@ -15,9 +17,9 @@ public class LoginPage : BasePage
         _dashboardHeader = new DashboardHeaderComponent(driver, config);
     }
 
-    public void NavigateToLoginPage()
+    protected override void Load()
     {
-        NavigateToUrl(Config.BaseUrl);
+        Driver.Navigate().GoToUrl(Config.BaseUrl);
         _loginForm.WaitForLoginForm();
     }
 
@@ -30,5 +32,11 @@ public class LoginPage : BasePage
     {
         WaitForUrlContains("inventory.html");
         return _dashboardHeader.GetHeader();
+    }
+
+    protected override void IsLoaded()
+    {
+        Assert.That(Driver.Url.Contains("saucedemo.com"), Is.True, "Login page not loaded!");
+        Assert.That(IsElementVisible(UsernameField, 2), Is.True, "Username field not visible on login page!");
     }
 }

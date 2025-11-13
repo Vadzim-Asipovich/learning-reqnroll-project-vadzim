@@ -5,13 +5,13 @@ using learning_reqnroll_project_vadzim.Configuration;
 
 namespace learning_reqnroll_project_vadzim.Pages;
 
-public abstract class BasePage
+public abstract class BasePage<T> : LoadableComponent<T> where T : LoadableComponent<T>
 {
     protected readonly IWebDriver Driver;
     protected readonly TestConfiguration Config;
     protected readonly WebDriverWait Wait;
 
-    protected BasePage(IWebDriver driver, TestConfiguration config)
+    protected BasePage(IWebDriver driver, TestConfiguration config): base(driver)
     {
         Driver = driver ?? throw new ArgumentNullException(nameof(driver));
         Config = config ?? throw new ArgumentNullException(nameof(config));

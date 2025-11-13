@@ -15,28 +15,30 @@ public class LoginSteps : BaseSteps
     [Given("I am on the login page")]
     public void GivenIAmOnTheLoginPage()
     {
-        GetLoginPage().NavigateToLoginPage();
+        GetLoginPage().Get();
     }
 
     [When("I enter valid credentials")]
     public void WhenIEnterValidCredentials()
     {
-        GetLoginPage().EnterCredentials(Config.Credentials.Username, Config.Credentials.Password);
+        GetLoginPage().Get().EnterCredentials(Config.Credentials.Username, Config.Credentials.Password);
     }
 
     [Then("I should see the dashboard")]
     public void ThenIShouldSeeTheDashboard()
     {
-        var header = GetLoginPage().GetDashboardHeader();
+        // After login, we're on the inventory page, so don't reload the login page
+        var loginPage = GetLoginPage();
+        var header = loginPage.GetDashboardHeader();
         Assert.That(header.Displayed, Is.True, "Dashboard header is not visible after login");
     }
 
     [Given("I am logged in")]
     public void GivenIAmLoggedIn()
     {
-        GetLoginPage().NavigateToLoginPage();
-        GetLoginPage().EnterCredentials(Config.Credentials.Username, Config.Credentials.Password);
-        var header = GetLoginPage().GetDashboardHeader();
+        var loginPage = GetLoginPage().Get();
+        loginPage.EnterCredentials(Config.Credentials.Username, Config.Credentials.Password);
+        var header = loginPage.GetDashboardHeader();
         Assert.That(header.Displayed, Is.True, "Dashboard header is not visible after login");
     }
 }

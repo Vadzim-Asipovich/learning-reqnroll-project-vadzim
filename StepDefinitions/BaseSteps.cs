@@ -28,10 +28,18 @@ public abstract class BaseSteps
         return ScenarioContext.Get<IWebDriver>("WebDriver");
     }
 
-    protected T GetPage<T>() where T : BasePage
+    protected T GetPage<T>() where T : LoadableComponent<T>
     {
         var driver = GetDriver();
         return (T)Activator.CreateInstance(typeof(T), driver, Config)!;
+    }
+
+    /// <summary>
+    /// Gets a page instance and ensures it's loaded using the LoadableComponent pattern.
+    /// </summary>
+    protected T GetLoadedPage<T>() where T : LoadableComponent<T>
+    {
+        return GetPage<T>().Get();
     }
 
     protected void SetValue<T>(string key, T value)
