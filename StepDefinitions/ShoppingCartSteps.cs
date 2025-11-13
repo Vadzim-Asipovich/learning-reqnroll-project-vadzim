@@ -10,18 +10,18 @@ public class ShoppingCartSteps : BaseSteps
     {
     }
 
-    private ShoppingCartPage GetShoppingCartPage() => GetPage<ShoppingCartPage>();
+    private ShoppingCartPage GetLoadedShoppingCartPage() => GetLoadedPage<ShoppingCartPage>();
 
     [When("I add the first item to the cart")]
     public void WhenIAddTheFirstItemToTheCart()
     {
-        GetShoppingCartPage().Get().AddFirstItemToCart();
+        GetLoadedShoppingCartPage().AddFirstItemToCart();
     }
 
     [Then("I should see the item count in the cart icon is {string}")]
     public void ThenIShouldSeeTheItemCountInTheCartIconIs(string expectedCount)
     {
-        var actualCount = GetShoppingCartPage().Get().GetCartItemCount();
+        var actualCount = GetLoadedShoppingCartPage().GetCartItemCount();
         Assert.That(actualCount, Is.EqualTo(expectedCount), 
             $"Expected cart count '{expectedCount}' but found '{actualCount}'");
     }
@@ -29,19 +29,19 @@ public class ShoppingCartSteps : BaseSteps
     [Given("I have added an item to the cart")]
     public void GivenIHaveAddedAnItemToTheCart()
     {
-        GetShoppingCartPage().Get().AddFirstItemToCart();
+        GetLoadedShoppingCartPage().AddFirstItemToCart();
     }
 
     [When("I remove the item from the cart")]
     public void WhenIRemoveTheItemFromTheCart()
     {
-        GetShoppingCartPage().Get().RemoveItemFromCart();
+        GetLoadedShoppingCartPage().RemoveItemFromCart();
     }
 
     [Then("the cart should be empty")]
     public void ThenTheCartShouldBeEmpty()
     {
-        var isCartEmpty = GetShoppingCartPage().Get().IsCartEmpty();
+        var isCartEmpty = GetLoadedShoppingCartPage().IsCartEmpty();
         Assert.That(isCartEmpty, Is.True, "Cart is not empty - badge is still visible");
     }
 }

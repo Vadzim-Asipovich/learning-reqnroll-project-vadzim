@@ -55,6 +55,7 @@ public class DriverFactory
         options.AddUserProfilePreference("profile.password_manager_enabled", false);
         
         // Disable Chrome's password leak detection and security warnings
+        options.AddUserProfilePreference("profile.password_manager_leak_detection", false);
         options.AddUserProfilePreference("profile.default_content_setting_values.notifications", 2);
         
         // Additional arguments to suppress password-related dialogs

@@ -1,4 +1,6 @@
+using System;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 using NUnit.Framework;
 using learning_reqnroll_project_vadzim.Configuration;
 using learning_reqnroll_project_vadzim.Pages.Components;
@@ -24,16 +26,32 @@ public class ShoppingCartPage : BasePage<ShoppingCartPage>
 
     public string GetCartItemCount()
     {
-        return _shoppingCart.GetCartItemCount();
+        return _shoppingCart.Get().GetCartItemCount();
     }
 
     public void RemoveItemFromCart()
     {
         ClickElement(RemoveButton);
+        // Wait for the badge to be removed from DOM after removing the item
+        var badgeLocator = By.ClassName("shopping_cart_badge");
+        var shortWait = new WebDriverWait(Driver, TimeSpan.FromSeconds(5));
+        shortWait.Until(driver =>
+        {
+            try
+            {
+                driver.FindElement(badgeLocator);
+                return false; // Badge still exists
+            }
+            catch (OpenQA.Selenium.NoSuchElementException)
+            {
+                return true; // Badge removed from DOM, cart is empty
+            }
+        });
     }
 
     public bool IsCartEmpty()
     {
+        // Component should already be loaded, just check if badge is visible
         return _shoppingCart.IsCartEmpty();
     }
 
@@ -45,6 +63,7 @@ public class ShoppingCartPage : BasePage<ShoppingCartPage>
             Driver.Navigate().GoToUrl(Config.BaseUrl + "inventory.html");
         }
         WaitForElement(InventoryContainer);
+        _shoppingCart.Get();
     }
 
     protected override void IsLoaded()

@@ -2,16 +2,17 @@ using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using learning_reqnroll_project_vadzim.Configuration;
+using learning_reqnroll_project_vadzim.Pages;
 
 namespace learning_reqnroll_project_vadzim.Pages.Components;
 
-public abstract class BaseComponent
+public abstract class BaseComponent<T> : LoadableComponent<T> where T : BaseComponent<T>
 {
     protected readonly IWebDriver Driver;
     protected readonly TestConfiguration Config;
     protected readonly WebDriverWait Wait;
 
-    protected BaseComponent(IWebDriver driver, TestConfiguration config)
+    protected BaseComponent(IWebDriver driver, TestConfiguration config) : base(driver)
     {
         Driver = driver ?? throw new ArgumentNullException(nameof(driver));
         Config = config ?? throw new ArgumentNullException(nameof(config));

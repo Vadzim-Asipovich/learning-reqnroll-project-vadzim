@@ -20,18 +20,18 @@ public class LoginPage : BasePage<LoginPage>
     protected override void Load()
     {
         Driver.Navigate().GoToUrl(Config.BaseUrl);
-        _loginForm.WaitForLoginForm();
+        _loginForm.Get();
     }
 
     public void EnterCredentials(string username, string password)
     {
-        _loginForm.EnterCredentials(username, password);
+        _loginForm.Get().EnterCredentials(username, password);
     }
 
     public IWebElement GetDashboardHeader()
     {
         WaitForUrlContains("inventory.html");
-        return _dashboardHeader.GetHeader();
+        return _dashboardHeader.Get().GetHeader();
     }
 
     protected override void IsLoaded()
