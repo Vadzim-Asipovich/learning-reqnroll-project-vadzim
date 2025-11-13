@@ -2,8 +2,9 @@ using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using learning_reqnroll_project_vadzim.Configuration;
+using learning_reqnroll_project_vadzim.Pages.Core;
 
-namespace learning_reqnroll_project_vadzim.Pages;
+namespace learning_reqnroll_project_vadzim.Pages.Core;
 
 public abstract class BasePage<T> : LoadableComponent<T> where T : LoadableComponent<T>
 {
@@ -92,3 +93,4 @@ public abstract class BasePage<T> : LoadableComponent<T> where T : LoadableCompo
         Driver.Navigate().GoToUrl(url);
     }
 }
+

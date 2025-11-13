@@ -1,6 +1,6 @@
 using OpenQA.Selenium;
 
-namespace learning_reqnroll_project_vadzim.Pages;
+namespace learning_reqnroll_project_vadzim.Pages.Core;
 
 public abstract class LoadableComponent<T> where T : LoadableComponent<T>
 {
@@ -22,3 +22,4 @@ public abstract class LoadableComponent<T> where T : LoadableComponent<T>
         return (T)this;
     }
 }
+

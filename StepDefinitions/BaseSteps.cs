@@ -2,7 +2,7 @@ using System;
 using Reqnroll;
 using OpenQA.Selenium;
 using learning_reqnroll_project_vadzim.Configuration;
-using learning_reqnroll_project_vadzim.Pages;
+using learning_reqnroll_project_vadzim.Pages.Core;
 
 namespace learning_reqnroll_project_vadzim.StepDefinitions;
 

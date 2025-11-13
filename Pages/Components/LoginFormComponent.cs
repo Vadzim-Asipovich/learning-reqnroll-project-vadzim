@@ -2,6 +2,7 @@ using System;
 using OpenQA.Selenium;
 using NUnit.Framework;
 using learning_reqnroll_project_vadzim.Configuration;
+using learning_reqnroll_project_vadzim.Pages.Core;
 
 namespace learning_reqnroll_project_vadzim.Pages.Components;
 
