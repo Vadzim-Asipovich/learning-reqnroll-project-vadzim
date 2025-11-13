@@ -33,32 +33,16 @@ public class ShoppingCartPage : BasePage<ShoppingCartPage>
     public void RemoveItemFromCart()
     {
         ClickElement(RemoveButton);
-        // Wait for the badge to be removed from DOM after removing the item
-        var badgeLocator = By.ClassName("shopping_cart_badge");
-        var shortWait = new WebDriverWait(Driver, TimeSpan.FromSeconds(5));
-        shortWait.Until(driver =>
-        {
-            try
-            {
-                driver.FindElement(badgeLocator);
-                return false; // Badge still exists
-            }
-            catch (OpenQA.Selenium.NoSuchElementException)
-            {
-                return true; // Badge removed from DOM, cart is empty
-            }
-        });
+
     }
 
     public bool IsCartEmpty()
     {
-        // Component should already be loaded, just check if badge is visible
         return _shoppingCart.IsCartEmpty();
     }
 
     protected override void Load()
     {
-        // Only navigate if we're not already on the inventory page
         if (!Driver.Url.Contains("inventory"))
         {
             Driver.Navigate().GoToUrl(Config.BaseUrl + "inventory.html");
