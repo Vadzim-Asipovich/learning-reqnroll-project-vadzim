@@ -2,16 +2,17 @@ using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using learning_reqnroll_project_vadzim.Configuration;
+using learning_reqnroll_project_vadzim.Pages.Core;
 
-namespace learning_reqnroll_project_vadzim.Pages;
+namespace learning_reqnroll_project_vadzim.Pages.Core;
 
-public abstract class BasePage
+public abstract class BaseComponent<T> : LoadableComponent<T> where T : BaseComponent<T>
 {
     protected readonly IWebDriver Driver;
     protected readonly TestConfiguration Config;
     protected readonly WebDriverWait Wait;
 
-    protected BasePage(IWebDriver driver, TestConfiguration config)
+    protected BaseComponent(IWebDriver driver, TestConfiguration config) : base(driver)
     {
         Driver = driver ?? throw new ArgumentNullException(nameof(driver));
         Config = config ?? throw new ArgumentNullException(nameof(config));
@@ -45,15 +46,6 @@ public abstract class BasePage
         });
     }
 
-    protected void WaitForUrlContains(string partialUrl, int? timeoutSeconds = null)
-    {
-        var wait = timeoutSeconds.HasValue 
-            ? new WebDriverWait(Driver, TimeSpan.FromSeconds(timeoutSeconds.Value))
-            : Wait;
-        
-        wait.Until(driver => driver.Url.Contains(partialUrl));
-    }
-
     protected void ClickElement(By locator)
     {
         var element = WaitForElementClickable(locator);
@@ -83,12 +75,5 @@ public abstract class BasePage
             return false;
         }
     }
-
-    protected void NavigateToUrl(string url)
-    {
-        if (string.IsNullOrWhiteSpace(url))
-            throw new ArgumentException("URL cannot be null or empty", nameof(url));
-        
-        Driver.Navigate().GoToUrl(url);
-    }
 }
+

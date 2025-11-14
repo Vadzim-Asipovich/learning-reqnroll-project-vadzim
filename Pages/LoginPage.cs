@@ -1,43 +1,43 @@
-using System;
 using OpenQA.Selenium;
+using NUnit.Framework;
 using learning_reqnroll_project_vadzim.Configuration;
+using learning_reqnroll_project_vadzim.Pages.Core;
+using learning_reqnroll_project_vadzim.Pages.Components;
 
 namespace learning_reqnroll_project_vadzim.Pages;
 
-public class LoginPage : BasePage
+public class LoginPage : BasePage<LoginPage>
 {
+    private readonly LoginFormComponent _loginForm;
+    private readonly DashboardHeaderComponent _dashboardHeader;
     private By UsernameField => By.Id("user-name");
-    private By PasswordField => By.Id("password");
-    private By LoginButton => By.Id("login-button");
-    private By DashboardHeader => By.ClassName("app_logo");
 
     public LoginPage(IWebDriver driver, TestConfiguration config) : base(driver, config)
     {
+        _loginForm = new LoginFormComponent(driver, config);
+        _dashboardHeader = new DashboardHeaderComponent(driver, config);
     }
 
-    public void NavigateToLoginPage()
+    protected override void Load()
     {
-        NavigateToUrl(Config.BaseUrl);
-        WaitForElement(UsernameField);
+        Driver.Navigate().GoToUrl(Config.BaseUrl);
+        _loginForm.Get();
     }
 
     public void EnterCredentials(string username, string password)
     {
-        if (string.IsNullOrWhiteSpace(username))
-            throw new ArgumentException("Username cannot be null or empty", nameof(username));
-        if (string.IsNullOrWhiteSpace(password))
-            throw new ArgumentException("Password cannot be null or empty", nameof(password));
-
-        SendKeysToElement(UsernameField, username);
-        SendKeysToElement(PasswordField, password);
-        ClickElement(LoginButton);
+        _loginForm.Get().EnterCredentials(username, password);
     }
 
-    public void VerifyDashboardIsVisible()
+    public IWebElement GetDashboardHeader()
     {
         WaitForUrlContains("inventory.html");
-        
-        var header = WaitForElement(DashboardHeader);
-        Assert.That(header.Displayed, Is.True, "Dashboard header is not visible after login");
+        return _dashboardHeader.Get().GetHeader();
+    }
+
+    protected override void IsLoaded()
+    {
+        Assert.That(Driver.Url.Contains("saucedemo.com"), Is.True, "Login page not loaded!");
+        Assert.That(IsElementVisible(UsernameField, 2), Is.True, "Username field not visible on login page!");
     }
 }
