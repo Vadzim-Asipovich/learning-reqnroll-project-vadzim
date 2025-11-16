@@ -16,9 +16,9 @@ public abstract class BaseComponent<T> : LoadableComponent<T> where T : BaseComp
     {
         Driver = driver ?? throw new ArgumentNullException(nameof(driver));
         Config = config ?? throw new ArgumentNullException(nameof(config));
-        
-        var explicitWaitSeconds = config.Browser.ExplicitWaitSeconds > 0 
-            ? config.Browser.ExplicitWaitSeconds 
+
+        var explicitWaitSeconds = config.Browser.ExplicitWaitSeconds > 0
+            ? config.Browser.ExplicitWaitSeconds
             : 10;
         Wait = new WebDriverWait(driver, TimeSpan.FromSeconds(explicitWaitSeconds));
     }
@@ -35,10 +35,10 @@ public abstract class BaseComponent<T> : LoadableComponent<T> where T : BaseComp
 
     private IWebElement WaitForElement(By locator, int? timeoutSeconds, Func<IWebElement, bool> condition)
     {
-        var wait = timeoutSeconds.HasValue 
+        var wait = timeoutSeconds.HasValue
             ? new WebDriverWait(Driver, TimeSpan.FromSeconds(timeoutSeconds.Value))
             : Wait;
-        
+
         return wait.Until(driver =>
         {
             var element = driver.FindElement(locator);
@@ -54,6 +54,9 @@ public abstract class BaseComponent<T> : LoadableComponent<T> where T : BaseComp
 
     protected void SendKeysToElement(By locator, string text, bool clearFirst = true)
     {
+        if (string.IsNullOrWhiteSpace(text))
+            throw new ArgumentException("Key cannot be null or empty", nameof(text));
+
         var element = WaitForElement(locator);
         if (clearFirst)
         {

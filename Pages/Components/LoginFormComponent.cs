@@ -31,17 +31,11 @@ public class LoginFormComponent : BaseComponent<LoginFormComponent>
 
     public void EnterUsername(string username)
     {
-        if (string.IsNullOrWhiteSpace(username))
-            throw new ArgumentException("Username cannot be null or empty", nameof(username));
-
         SendKeysToElement(UsernameField, username);
     }
 
     public void EnterPassword(string password)
     {
-        if (string.IsNullOrWhiteSpace(password))
-            throw new ArgumentException("Password cannot be null or empty", nameof(password));
-
         SendKeysToElement(PasswordField, password);
     }
 
