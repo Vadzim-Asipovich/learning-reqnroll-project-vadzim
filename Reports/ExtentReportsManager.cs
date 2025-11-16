@@ -75,18 +75,15 @@ public class ExtentReportsManager
 
     private static string GetReportPath(string? configuredPath)
     {
-        if (configuredPath is not null && configuredPath.Trim().Length == 0)
+        // Treat empty or whitespace strings as null to use default path
+        if (string.IsNullOrWhiteSpace(configuredPath))
         {
-            throw new ArgumentException("Configured report path cannot be an empty or whitespace string.", nameof(configuredPath));
-        }
-        if (!string.IsNullOrWhiteSpace(configuredPath))
-        {
-            return configuredPath!;
+            var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            var reportsDir = Path.Combine(Directory.GetCurrentDirectory(), "Reports");
+            return Path.Combine(reportsDir, $"TestReport_{timestamp}.html");
         }
 
-        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-        var reportsDir = Path.Combine(Directory.GetCurrentDirectory(), "Reports");
-        return Path.Combine(reportsDir, $"TestReport_{timestamp}.html");
+        return configuredPath!;
     }
 }
 
