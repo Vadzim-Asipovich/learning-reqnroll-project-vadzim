@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 using Reqnroll;
 using OpenQA.Selenium;
 using learning_reqnroll_project_vadzim.Configuration;
-using learning_reqnroll_project_vadzim.Pages;
+using learning_reqnroll_project_vadzim.Pages.Core;
 
 namespace learning_reqnroll_project_vadzim.StepDefinitions;
 
@@ -28,29 +27,14 @@ public abstract class BaseSteps
         return ScenarioContext.Get<IWebDriver>("WebDriver");
     }
 
-    protected T GetPage<T>() where T : BasePage
+    protected T GetPage<T>() where T : LoadableComponent<T>
     {
         var driver = GetDriver();
         return (T)Activator.CreateInstance(typeof(T), driver, Config)!;
     }
-
-    protected void SetValue<T>(string key, T value)
+    
+    protected T GetLoadedPage<T>() where T : LoadableComponent<T>
     {
-        ScenarioContext.Set(value, key);
-    }
-
-    protected T GetValue<T>(string key)
-    {
-        if (!ScenarioContext.ContainsKey(key))
-        {
-            throw new KeyNotFoundException($"Key '{key}' not found in ScenarioContext.");
-        }
-
-        return ScenarioContext.Get<T>(key);
-    }
-
-    protected bool HasValue(string key)
-    {
-        return ScenarioContext.ContainsKey(key);
+        return GetPage<T>().Get();
     }
 }

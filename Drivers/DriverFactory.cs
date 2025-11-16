@@ -41,9 +41,26 @@ public class DriverFactory
     private IWebDriver CreateChromeDriver()
     {
         var options = CreateBrowserOptions<ChromeOptions>();
+        ConfigureChromePreferences(options);
         var driver = new ChromeDriver(options);
         ConfigureDriver(driver);
         return driver;
+    }
+
+    private void ConfigureChromePreferences(ChromeOptions options)
+    {
+        // Disable password manager and password change popups
+        options.AddUserProfilePreference("credentials_enable_service", false);
+        options.AddUserProfilePreference("password_manager_enabled", false);
+        options.AddUserProfilePreference("profile.password_manager_enabled", false);
+        
+        // Disable Chrome's password leak detection and security warnings
+        options.AddUserProfilePreference("profile.password_manager_leak_detection", false);
+        options.AddUserProfilePreference("profile.default_content_setting_values.notifications", 2);
+        
+        // Additional arguments to suppress password-related dialogs
+        options.AddArgument("--disable-password-manager-reauthentication");
+        options.AddArgument("--disable-features=PasswordChange");
     }
 
     private IWebDriver CreateEdgeDriver()

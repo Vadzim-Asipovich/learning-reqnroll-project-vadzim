@@ -1,18 +1,23 @@
 using System;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
+using NUnit.Framework;
 using learning_reqnroll_project_vadzim.Configuration;
+using learning_reqnroll_project_vadzim.Pages.Core;
+using learning_reqnroll_project_vadzim.Pages.Components;
 
 namespace learning_reqnroll_project_vadzim.Pages;
 
-public class ShoppingCartPage : BasePage
+public class ShoppingCartPage : BasePage<ShoppingCartPage>
 {
     private By FirstAddToCartButton => By.Id("add-to-cart-sauce-labs-backpack");
-    private By CartIcon => By.ClassName("shopping_cart_link");
-    private By CartBadge => By.ClassName("shopping_cart_badge");
     private By RemoveButton => By.Id("remove-sauce-labs-backpack");
+    private By InventoryContainer => By.Id("inventory_container");
+    private readonly ShoppingCartComponent _shoppingCart;
 
     public ShoppingCartPage(IWebDriver driver, TestConfiguration config) : base(driver, config)
     {
+        _shoppingCart = new ShoppingCartComponent(driver, config);
     }
 
     public void AddFirstItemToCart()
@@ -20,23 +25,36 @@ public class ShoppingCartPage : BasePage
         ClickElement(FirstAddToCartButton);
     }
 
-    public void VerifyCartItemCount(string expectedCount)
+    public string GetCartItemCount()
     {
-        var badge = WaitForElement(CartBadge);
-        var actualCount = badge.Text;
-        Assert.That(actualCount, Is.EqualTo(expectedCount), 
-            $"Expected cart count '{expectedCount}' but found '{actualCount}'");
+        return _shoppingCart.Get().GetCartItemCount();
     }
 
     public void RemoveItemFromCart()
     {
         ClickElement(RemoveButton);
+
     }
 
-    public void VerifyCartIsEmpty()
+    public bool IsCartEmpty()
     {
-        var isCartBadgeVisible = IsElementVisible(CartBadge, timeoutSeconds: 2);
-        Assert.That(isCartBadgeVisible, Is.False, "Cart is not empty - badge is still visible");
+        return _shoppingCart.IsCartEmpty();
+    }
+
+    protected override void Load()
+    {
+        if (!Driver.Url.Contains("inventory"))
+        {
+            Driver.Navigate().GoToUrl(Config.BaseUrl + "inventory.html");
+        }
+        WaitForElement(InventoryContainer);
+        _shoppingCart.Get();
+    }
+
+    protected override void IsLoaded()
+    {
+        Assert.That(Driver.Url.Contains("inventory"), Is.True, "Shopping cart page not loaded!");
+        Assert.That(IsElementVisible(InventoryContainer, 2), Is.True, "Inventory container not visible!");
     }
 }
 
