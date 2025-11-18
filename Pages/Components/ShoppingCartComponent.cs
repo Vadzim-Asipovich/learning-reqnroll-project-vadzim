@@ -27,8 +27,11 @@ public class ShoppingCartComponent : BaseComponent<ShoppingCartComponent>
 
     public string GetCartItemCount()
     {
-        var badge = WaitForElement(CartBadge);
-        return badge.Text;
+        return RetryStaleElement(() =>
+        {
+            var badge = WaitForElement(CartBadge);
+            return badge.Text;
+        });
     }
 
     public bool IsCartEmpty()
@@ -36,8 +39,11 @@ public class ShoppingCartComponent : BaseComponent<ShoppingCartComponent>
         // Check if badge exists and is visible, or if it doesn't exist at all
         try
         {
-            var badge = Driver.FindElement(CartBadge);
-            return !badge.Displayed;
+            return RetryStaleElement(() =>
+            {
+                var badge = Driver.FindElement(CartBadge);
+                return !badge.Displayed;
+            });
         }
         catch (OpenQA.Selenium.NoSuchElementException)
         {

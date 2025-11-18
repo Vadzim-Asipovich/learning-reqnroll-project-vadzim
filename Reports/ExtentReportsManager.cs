@@ -24,12 +24,12 @@ public class ExtentReportsManager
                 return _extent;
 
             _extent = new ExtentReports();
-            
+
             var reportPath = GetReportPath(reportSettings.ReportPath);
             Directory.CreateDirectory(Path.GetDirectoryName(reportPath) ?? "Reports");
 
             var htmlReporter = new ExtentHtmlReporter(reportPath);
-            
+
             htmlReporter.Config.Theme = reportSettings.Theme == "Dark"
                 ? AventStack.ExtentReports.Reporter.Configuration.Theme.Dark
                 : AventStack.ExtentReports.Reporter.Configuration.Theme.Standard;
@@ -75,14 +75,15 @@ public class ExtentReportsManager
 
     private static string GetReportPath(string? configuredPath)
     {
-        if (!string.IsNullOrWhiteSpace(configuredPath))
+        // Treat empty or whitespace strings as null to use default path
+        if (string.IsNullOrWhiteSpace(configuredPath))
         {
-            return configuredPath;
+            var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            var reportsDir = Path.Combine(Directory.GetCurrentDirectory(), "Reports");
+            return Path.Combine(reportsDir, $"TestReport_{timestamp}.html");
         }
 
-        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-        var reportsDir = Path.Combine(Directory.GetCurrentDirectory(), "Reports");
-        return Path.Combine(reportsDir, $"TestReport_{timestamp}.html");
+        return configuredPath!;
     }
 }
 
